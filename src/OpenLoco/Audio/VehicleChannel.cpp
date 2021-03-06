@@ -1,5 +1,6 @@
 #include "VehicleChannel.h"
 #include "../Interop/Interop.hpp"
+#include "../Ptr.h"
 #include "../Things/ThingManager.h"
 #include "../Vehicles/Vehicle.h"
 
@@ -10,9 +11,9 @@ using namespace OpenLoco::Interop;
 static std::pair<sound_id, channel_attributes> sub_48A590(const Vehicles::Vehicle2or6* v)
 {
     registers regs;
-    regs.esi = (int32_t)v;
+    regs.esi = ToInt(v);
     call(0x0048A590, regs);
-    return { static_cast<sound_id>(regs.eax), { regs.ecx, regs.edx, regs.ebx } };
+    return { static_cast<sound_id>(regs.eax), { (int32_t)regs.ecx, (int32_t)regs.edx, (int32_t)regs.ebx } };
 }
 
 vehicle_channel::vehicle_channel(channel&& c)

@@ -2,6 +2,7 @@
 #include "../Interop/Interop.hpp"
 #include "../Map/Tile.h"
 #include "../OpenLoco.h"
+#include "../Ptr.h"
 #include "../Vehicles/Vehicle.h"
 
 using namespace OpenLoco::Interop;
@@ -77,14 +78,14 @@ namespace OpenLoco::ThingManager
     {
         registers regs;
         call(0x004700A5, regs);
-        return (thing_base*)regs.esi;
+        return ToPtr(thing_base, regs.esi);
     }
 
     // 0x0047024A
     void freeThing(thing_base* const thing)
     {
         registers regs;
-        regs.esi = reinterpret_cast<uint32_t>(thing);
+        regs.esi = ToInt(thing);
         call(0x0047024A, regs);
     }
 
@@ -110,7 +111,7 @@ namespace OpenLoco::ThingManager
     void moveSpriteToList(thing_base* const thing, const thing_list list)
     {
         registers regs{};
-        regs.esi = reinterpret_cast<uint32_t>(thing);
+        regs.esi = ToInt(thing);
         regs.ecx = (static_cast<int8_t>(list) + 1) * 2; // Loco function expects to use this to access an array of words
         call(0x0047019F, regs);
     }

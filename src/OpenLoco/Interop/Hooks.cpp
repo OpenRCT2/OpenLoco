@@ -18,6 +18,7 @@
 #include "../Map/Tile.h"
 #include "../Paint/Paint.h"
 #include "../Platform/Platform.h"
+#include "../Ptr.h"
 #include "../S5/S5.h"
 #include "../Scenario.h"
 #include "../Station.h"
@@ -38,8 +39,13 @@ using namespace OpenLoco;
 #define STDCALL __stdcall
 #define CDECL __cdecl
 #elif defined(__GNUC__)
+#if defined(__i386__) || defined(_M_IX86)
 #define STDCALL __attribute__((stdcall))
 #define CDECL __attribute__((cdecl))
+#else
+#define STDCALL
+#define CDECL
+#endif
 #else
 #error Unknown compiler, please define STDCALL and CDECL
 #endif
@@ -446,7 +452,7 @@ static int32_t STDCALL lib_CreateFileA(
         return -1;
     }
 
-    return (int32_t)pFILE;
+    return ToInt(pFILE);
 }
 
 FORCE_ALIGN_ARG_POINTER
@@ -602,7 +608,7 @@ static void registerAudioHooks()
     registerHook(
         0x0048A4BF,
         [](registers& regs) FORCE_ALIGN_ARG_POINTER -> uint8_t {
-            Audio::playSound((Vehicles::Vehicle2or6*)regs.esi);
+            Audio::playSound(ToPtr(Vehicles::Vehicle2or6, regs.esi));
             return 0;
         });
     registerHook(
@@ -652,7 +658,7 @@ void OpenLoco::Interop::registerHooks()
             // TODO: use Utility::strlcpy with the buffer size instead of std::strcpy, if possible
             std::strcpy(buffer, path.make_preferred().u8string().c_str());
 
-            regs.ebx = (int32_t)buffer;
+            regs.ebx = ToInt(buffer);
             return 0;
         });
 
@@ -691,7 +697,7 @@ void OpenLoco::Interop::registerHooks()
         0x00451025,
         [](registers& regs) FORCE_ALIGN_ARG_POINTER -> uint8_t {
             registers backup = regs;
-            auto pos = Gfx::drawString((Gfx::drawpixelinfo_t*)regs.edi, regs.cx, regs.dx, regs.al, (uint8_t*)regs.esi);
+            auto pos = Gfx::drawString(ToPtr(Gfx::drawpixelinfo_t, regs.edi), regs.cx, regs.dx, regs.al, ToPtr(uint8_t, regs.esi));
             regs = backup;
             regs.cx = pos.x;
             regs.dx = pos.y;
@@ -711,9 +717,9 @@ void OpenLoco::Interop::registerHooks()
         0x004958C6,
         [](registers& regs) FORCE_ALIGN_ARG_POINTER -> uint8_t {
             registers backup = regs;
-            char* buffer = StringManager::formatString((char*)regs.edi, regs.eax, (void*)regs.ecx);
+            char* buffer = StringManager::formatString(ToPtr(char, regs.edi), regs.eax, ToPtr(void, regs.ecx));
             regs = backup;
-            regs.edi = (uint32_t)buffer;
+            regs.edi = ToInt(buffer);
             return 0;
         });
 
@@ -746,8 +752,8 @@ void OpenLoco::Interop::registerHooks()
         0x004CA4DF,
         [](registers& regs) FORCE_ALIGN_ARG_POINTER -> uint8_t {
             registers backup = regs;
-            auto window = (Ui::window*)regs.esi;
-            auto dpi = (Gfx::drawpixelinfo_t*)regs.edi;
+            auto window = ToPtr(Ui::window, regs.esi);
+            auto dpi = ToPtr(Gfx::drawpixelinfo_t, regs.edi);
             window->draw(dpi);
             regs = backup;
             return 0;
@@ -787,7 +793,7 @@ void OpenLoco::Interop::registerHooks()
             int16_t x = regs.eax;
             int16_t i = regs.ebx / 6;
             int16_t y = regs.ecx;
-            OpenLoco::Map::surface_element* surface = (OpenLoco::Map::surface_element*)regs.esi;
+            OpenLoco::Map::surface_element* surface = ToPtr(OpenLoco::Map::surface_element, regs.esi);
 
             surface->createWave(x, y, i);
 
@@ -798,7 +804,7 @@ void OpenLoco::Interop::registerHooks()
     registerHook(
         0x004AB655,
         [](registers& regs) -> uint8_t {
-            auto v = (Vehicles::VehicleBase*)regs.esi;
+            auto v = ToPtr(Vehicles::VehicleBase, regs.esi);
             v->asVehicleBody()->secondaryAnimationUpdate();
 
             return 0;
@@ -815,7 +821,7 @@ void OpenLoco::Interop::registerHooks()
         0x004C6456,
         [](registers& regs) FORCE_ALIGN_ARG_POINTER -> uint8_t {
             registers backup = regs;
-            auto window = (Ui::window*)regs.esi;
+            auto window = ToPtr(Ui::window, regs.esi);
             window->viewportsUpdatePosition();
             regs = backup;
             return 0;
@@ -825,7 +831,7 @@ void OpenLoco::Interop::registerHooks()
         0x004C9513,
         [](registers& regs) -> uint8_t {
             registers backup = regs;
-            auto window = (Ui::window*)regs.esi;
+            auto window = ToPtr(Ui::window, regs.esi);
             int16_t x = regs.ax;
             int16_t y = regs.bx;
 
@@ -849,7 +855,7 @@ void OpenLoco::Interop::registerHooks()
         0x004CA115,
         [](registers& regs) -> uint8_t {
             registers backup = regs;
-            auto window = (Ui::window*)regs.esi;
+            auto window = ToPtr(Ui::window, regs.esi);
             window->updateScrollWidgets();
             regs = backup;
 
@@ -860,7 +866,7 @@ void OpenLoco::Interop::registerHooks()
         0x004CA17F,
         [](registers& regs) -> uint8_t {
             registers backup = regs;
-            auto window = (Ui::window*)regs.esi;
+            auto window = ToPtr(Ui::window, regs.esi);
             window->initScrollWidgets();
             regs = backup;
 

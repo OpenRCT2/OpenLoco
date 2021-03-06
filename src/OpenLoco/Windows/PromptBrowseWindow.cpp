@@ -9,6 +9,7 @@
 #include "../Localisation/StringIds.h"
 #include "../OpenLoco.h"
 #include "../Platform/Platform.h"
+#include "../Ptr.h"
 #include "../S5/S5.h"
 #include "../Scenario.h"
 #include "../Ui.h"
@@ -388,8 +389,8 @@ namespace OpenLoco::Ui::PromptBrowse
 
         // Resume the original prepare_draw routine beyond the widget repositioning.
         registers regs;
-        regs.edi = (int32_t)buffer;
-        regs.esi = (int32_t)self;
+        regs.edi = ToInt(buffer);
+        regs.esi = ToInt(self);
         call(0x00445D91, regs);
     }
 
@@ -785,9 +786,9 @@ namespace OpenLoco::Ui::PromptBrowse
             [](registers& regs) FORCE_ALIGN_ARG_POINTER -> uint8_t {
                 auto result = open(
                     (browse_type)regs.al,
-                    (char*)regs.ecx,
-                    (const char*)regs.edx,
-                    (const char*)regs.ebx);
+                    ToPtr(char, regs.ecx),
+                    ToPtr(const char, regs.edx),
+                    ToPtr(const char, regs.ebx));
                 regs.eax = result ? 1 : 0;
                 return 0;
             });
@@ -795,7 +796,7 @@ namespace OpenLoco::Ui::PromptBrowse
         registerHook(
             0x00446E62,
             [](registers& regs) FORCE_ALIGN_ARG_POINTER -> uint8_t {
-                appendDirectory((char*)regs.ebp);
+                appendDirectory(ToPtr(char, regs.ebp));
                 return 0;
             });
     }
@@ -940,7 +941,7 @@ namespace OpenLoco::Ui::PromptBrowse
     static void sub_446E87(window* self)
     {
         registers regs;
-        regs.esi = (int32_t)self;
+        regs.esi = ToInt(self);
         call(0x00446E87, regs);
     }
 }

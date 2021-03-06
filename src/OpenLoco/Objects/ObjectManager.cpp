@@ -4,6 +4,7 @@
 #include "../Interop/Interop.hpp"
 #include "../Localisation/FormatArguments.hpp"
 #include "../Localisation/StringIds.h"
+#include "../Ptr.h"
 #include <vector>
 
 using namespace OpenLoco::Interop;
@@ -15,14 +16,18 @@ namespace OpenLoco::ObjectManager
     {
         uint32_t dataSize;
     };
+#if defined(__i386__) || defined(_M_IX86)
     static_assert(sizeof(ObjectEntry2) == 0x14);
+#endif
 
     struct object_repository_item
     {
         object** objects;
         ObjectEntry2* object_entry_extendeds;
     };
+#if defined(__i386__) || defined(_M_IX86)
     static_assert(sizeof(object_repository_item) == 8);
+#endif
 #pragma pack(pop)
 
     loco_global<ObjectEntry2[maxObjects], 0x1125A90> objectEntries;
@@ -387,7 +392,7 @@ namespace OpenLoco::ObjectManager
     void getScenarioText(ObjectHeader& object)
     {
         registers regs;
-        regs.ebp = reinterpret_cast<int32_t>(&object);
+        regs.ebp = ToInt(&object);
         call(0x0047176D, regs);
     }
 
@@ -474,7 +479,7 @@ namespace OpenLoco::ObjectManager
 
                 registers regs;
                 regs.al = static_cast<uint8_t>(proc);
-                regs.esi = reinterpret_cast<uint32_t>(obj);
+                regs.esi = ToInt(obj);
                 return (call(objectProc, regs) & X86_FLAG_CARRY) != 0;
             }
         }

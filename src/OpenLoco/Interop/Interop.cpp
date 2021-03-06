@@ -12,10 +12,13 @@
 #endif // _WIN32
 
 #include "../Console.h"
+#include "../Ptr.h"
 #include "Interop.hpp"
 
 #pragma warning(disable : 4731) // frame pointer register 'ebp' modified by inline assembly code
+#if defined(__i386__) || defined(_M_IX86)
 #define PLATFORM_X86
+#endif
 
 #if defined(__GNUC__)
 #ifdef __clang__
@@ -93,7 +96,7 @@ namespace OpenLoco::Interop
     }
 #endif
 
-    static int32_t DISABLE_OPT callByRef(int32_t address, int32_t* _eax, int32_t* _ebx, int32_t* _ecx, int32_t* _edx, int32_t* _esi, int32_t* _edi, int32_t* _ebp)
+    static int32_t DISABLE_OPT callByRef(int32_t address, intptr_t* _eax, intptr_t* _ebx, intptr_t* _ecx, intptr_t* _edx, intptr_t* _esi, intptr_t* _edi, intptr_t* _ebp)
     {
 #ifdef _LOG_INTEROP_CALLS_
         OpenLoco::Console::group("0x%x", address);
@@ -302,7 +305,7 @@ namespace OpenLoco::Interop
         }
 #else
         // We own the pages with PROT_WRITE | PROT_EXEC, we can simply just memcpy the data
-        std::memcpy(data, (void*)address, size);
+        std::memcpy(data, ToPtr(void, address), size);
 #endif // _WIN32
     }
 
@@ -315,7 +318,7 @@ namespace OpenLoco::Interop
         }
 #else
         // We own the pages with PROT_WRITE | PROT_EXEC, we can simply just memcpy the data
-        std::memcpy((void*)address, data, size);
+        std::memcpy(ToPtr(void, address), data, size);
 #endif // _WIN32
     }
 

@@ -11,6 +11,7 @@
 #include "../Map/Tile.h"
 #include "../Map/TileManager.h"
 #include "../MultiPlayer.h"
+#include "../Ptr.h"
 #include "../StationManager.h"
 #include "../Things/ThingManager.h"
 #include "../TownManager.h"
@@ -127,7 +128,7 @@ namespace OpenLoco::Ui::WindowManager
                 registers backup = regs;
                 auto* w = Vehicle::Main::open(reinterpret_cast<Vehicles::VehicleBase*>(regs.edx));
                 regs = backup;
-                regs.esi = reinterpret_cast<int32_t>(w);
+                regs.esi = ToInt(w);
                 return 0;
             });
 
@@ -135,7 +136,7 @@ namespace OpenLoco::Ui::WindowManager
             0x0045EFDB,
             [](registers& regs) FORCE_ALIGN_ARG_POINTER -> uint8_t {
                 registers backup = regs;
-                auto window = (Ui::window*)regs.esi;
+                auto window = ToPtr(Ui::window, regs.esi);
                 window->viewportZoomIn(false);
                 regs = backup;
                 return 0;
@@ -145,7 +146,7 @@ namespace OpenLoco::Ui::WindowManager
             0x0045F015,
             [](registers& regs) FORCE_ALIGN_ARG_POINTER -> uint8_t {
                 registers backup = regs;
-                auto window = (Ui::window*)regs.esi;
+                auto window = ToPtr(Ui::window, regs.esi);
                 window->viewportZoomOut(false);
                 regs = backup;
                 return 0;
@@ -204,7 +205,7 @@ namespace OpenLoco::Ui::WindowManager
             0x00495685,
             [](registers& regs) FORCE_ALIGN_ARG_POINTER -> uint8_t {
                 registers backup = regs;
-                const char* buffer = (const char*)regs.esi;
+                const char* buffer = ToPtr(const char, regs.esi);
                 uint16_t width = Gfx::getStringWidth(buffer);
                 regs = backup;
                 regs.cx = width;
@@ -218,7 +219,7 @@ namespace OpenLoco::Ui::WindowManager
                 registers backup = regs;
                 auto window = Windows::Town::open(regs.dx);
                 regs = backup;
-                regs.esi = (uintptr_t)window;
+                regs.esi = ToInt(window);
 
                 return 0;
             });
@@ -229,7 +230,7 @@ namespace OpenLoco::Ui::WindowManager
                 registers backup = regs;
                 auto window = Windows::Station::open(regs.dx);
                 regs = backup;
-                regs.esi = (uintptr_t)window;
+                regs.esi = ToInt(window);
 
                 return 0;
             });
@@ -240,7 +241,7 @@ namespace OpenLoco::Ui::WindowManager
                 registers backup = regs;
                 auto window = Windows::IndustryList::open();
                 regs = backup;
-                regs.esi = (uintptr_t)window;
+                regs.esi = ToInt(window);
 
                 return 0;
             });
@@ -291,7 +292,7 @@ namespace OpenLoco::Ui::WindowManager
                 registers backup = regs;
                 auto window = findAt(regs.ax, regs.bx);
                 regs = backup;
-                regs.esi = (uintptr_t)window;
+                regs.esi = ToInt(window);
 
                 return 0;
             });
@@ -302,7 +303,7 @@ namespace OpenLoco::Ui::WindowManager
                 registers backup = regs;
                 auto window = findAtAlt(regs.ax, regs.bx);
                 regs = backup;
-                regs.esi = (uintptr_t)window;
+                regs.esi = ToInt(window);
 
                 return 0;
             });
@@ -320,7 +321,7 @@ namespace OpenLoco::Ui::WindowManager
                     w = find((WindowType)regs.cx, regs.dx);
                 }
 
-                regs.esi = (uintptr_t)w;
+                regs.esi = ToInt(w);
                 if (w == nullptr)
                 {
                     return X86_FLAG_ZERO;
@@ -333,7 +334,7 @@ namespace OpenLoco::Ui::WindowManager
             0x004CA4BD,
             [](registers& regs) FORCE_ALIGN_ARG_POINTER -> uint8_t {
                 registers backup = regs;
-                auto window = (Ui::window*)regs.esi;
+                auto window = ToPtr(Ui::window, regs.esi);
                 if (window != nullptr)
                 {
                     window->invalidate();
@@ -384,7 +385,7 @@ namespace OpenLoco::Ui::WindowManager
             0x004CC6EA,
             [](registers& regs) FORCE_ALIGN_ARG_POINTER -> uint8_t {
                 registers backup = regs;
-                auto window = (Ui::window*)regs.esi;
+                auto window = ToPtr(Ui::window, regs.esi);
                 close(window);
                 regs = backup;
                 return 0;
@@ -422,7 +423,7 @@ namespace OpenLoco::Ui::WindowManager
             [](registers& regs) FORCE_ALIGN_ARG_POINTER -> uint8_t {
                 auto w = getMainWindow();
 
-                regs.esi = (uintptr_t)w;
+                regs.esi = ToInt(w);
                 if (w == nullptr)
                 {
                     return X86_FLAG_CARRY;
@@ -435,7 +436,7 @@ namespace OpenLoco::Ui::WindowManager
             0x004CEE0B,
             [](registers& regs) FORCE_ALIGN_ARG_POINTER -> uint8_t {
                 registers backup = regs;
-                sub_4CEE0B((Ui::window*)regs.esi);
+                sub_4CEE0B(ToPtr(Ui::window, regs.esi));
                 regs = backup;
 
                 return 0;
@@ -446,10 +447,10 @@ namespace OpenLoco::Ui::WindowManager
             [](registers& regs) FORCE_ALIGN_ARG_POINTER -> uint8_t {
                 registers backup = regs;
 
-                auto w = createWindow((WindowType)regs.cl, Gfx::point_t(regs.ax, regs.eax >> 16), Gfx::ui_size_t(regs.bx, regs.ebx >> 16), regs.ecx >> 8, (window_event_list*)regs.edx);
+                auto w = createWindow((WindowType)regs.cl, Gfx::point_t(regs.ax, regs.eax >> 16), Gfx::ui_size_t(regs.bx, regs.ebx >> 16), regs.ecx >> 8, ToPtr(window_event_list, regs.edx));
                 regs = backup;
 
-                regs.esi = (uintptr_t)w;
+                regs.esi = ToInt(w);
                 return 0;
             });
 
@@ -458,10 +459,10 @@ namespace OpenLoco::Ui::WindowManager
             [](registers& regs) FORCE_ALIGN_ARG_POINTER -> uint8_t {
                 registers backup = regs;
 
-                auto w = createWindow((WindowType)regs.cl, Gfx::ui_size_t(regs.bx, (((uint32_t)regs.ebx) >> 16)), regs.ecx >> 8, (window_event_list*)regs.edx);
+                auto w = createWindow((WindowType)regs.cl, Gfx::ui_size_t(regs.bx, (((uint32_t)regs.ebx) >> 16)), regs.ecx >> 8, ToPtr(window_event_list, regs.edx));
                 regs = backup;
 
-                regs.esi = (uintptr_t)w;
+                regs.esi = ToInt(w);
                 return 0;
             });
 
@@ -483,7 +484,7 @@ namespace OpenLoco::Ui::WindowManager
                 auto w = bringToFront((WindowType)regs.cx, regs.dx);
                 regs = backup;
 
-                regs.esi = (uintptr_t)w;
+                regs.esi = ToInt(w);
                 if (w == nullptr)
                 {
                     return X86_FLAG_ZERO;
@@ -801,10 +802,10 @@ namespace OpenLoco::Ui::WindowManager
     window* bringToFront(window* w)
     {
         registers regs;
-        regs.esi = (uint32_t)w;
+        regs.esi = ToInt(w);
         call(0x004CC750, regs);
 
-        return (window*)regs.esi;
+        return ToPtr(window, regs.esi);
     }
 
     // 0x004CD3A9
