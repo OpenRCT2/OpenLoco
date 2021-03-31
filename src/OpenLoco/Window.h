@@ -346,7 +346,7 @@ namespace OpenLoco::Ui
     {
         window_event_list* event_handlers;                 // 0x00
         Ui::viewport* viewports[2] = { nullptr, nullptr }; // 0x04
-        uint64_t enabled_widgets = 0;                      // 0x0C
+        uint64_t visible_widgets = 0;                      // 0x0C
         uint64_t disabled_widgets = 0;                     // 0x14
         uint64_t activated_widgets = 0;                    // 0x1C
         uint64_t holdable_widgets = 0;                     // 0x24
@@ -401,6 +401,18 @@ namespace OpenLoco::Ui
 
         window(Gfx::point_t position, Gfx::ui_size_t size);
 
+        template<typename... Args>
+        constexpr void setVisible(Args&&... widgets)
+        {
+            visible_widgets |= ((1ULL << static_cast<uint64_t>(widgets)), ...);
+        }
+
+        template<typename... Args>
+        constexpr void setHidden(Args&&... widgets)
+        {
+            visible_widgets &= ~((1ULL << static_cast<uint64_t>(widgets)), ...);
+        }
+
         constexpr bool setSize(Gfx::ui_size_t minSize, Gfx::ui_size_t maxSize)
         {
             bool hasResized = false;
@@ -454,7 +466,7 @@ namespace OpenLoco::Ui
             return (this->flags & WindowFlags::transparent) != 0;
         }
 
-        bool isEnabled(int8_t widget_index);
+        bool isVisible(int8_t widget_index);
         bool isDisabled(int8_t widget_index);
         bool isActivated(widget_index index);
         bool isHoldable(widget_index index);

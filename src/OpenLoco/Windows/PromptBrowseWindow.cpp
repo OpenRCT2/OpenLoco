@@ -201,7 +201,7 @@ namespace OpenLoco::Ui::PromptBrowse
         if (window != nullptr)
         {
             window->widgets = widgets;
-            window->enabled_widgets = (1 << widx::close_button) | (1 << widx::parent_button) | (1 << widx::ok_button);
+            window->setVisible(widx::close_button, widx::parent_button, widx::ok_button);
             window->initScrollWidgets();
 
             window->row_height = 11;
