@@ -210,7 +210,7 @@ namespace OpenLoco::Ui::Windows::ToolbarTop::Editor
         switch (itemIndex)
         {
             case 0:
-                call(0x0043DA43);
+                LandscapeGeneration::open();
                 break;
         }
     }

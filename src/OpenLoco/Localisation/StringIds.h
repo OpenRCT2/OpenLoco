@@ -279,6 +279,10 @@ namespace OpenLoco::StringIds
 
     constexpr string_id error_can_only_build_above_ground = 360;
 
+    constexpr string_id str_366 = 366;
+
+    constexpr string_id str_368 = 368;
+
     constexpr string_id error_game_save_failed = 370;
 
     constexpr string_id menu_hide_foreground_scenery_buildings = 372;
@@ -1114,7 +1118,9 @@ namespace OpenLoco::StringIds
     constexpr string_id industry_size_medium = 1668;
     constexpr string_id industry_size_high = 1669;
     constexpr string_id number_of_industries = 1670;
-
+    constexpr string_id str_1671 = 1671;
+    constexpr string_id str_1672 = 1672;
+    constexpr string_id str_1673 = 1673;
     constexpr string_id tooltip_scenario_options = 1674;
     constexpr string_id tooltip_scenario_challenge = 1675;
     constexpr string_id tooltip_company_options = 1676;
@@ -1153,6 +1159,8 @@ namespace OpenLoco::StringIds
     constexpr string_id unnamed = 1709;
     constexpr string_id landscape_save_failed = 1710;
     constexpr string_id scenario_save_failed = 1711;
+
+    constexpr string_id str_1711 = 1711;
 
     constexpr string_id chat_send_message = 1716;
     constexpr string_id chat_title = 1717;

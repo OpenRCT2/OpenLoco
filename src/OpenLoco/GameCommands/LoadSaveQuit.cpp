@@ -240,11 +240,11 @@ namespace OpenLoco::GameCommands
                 auto path = fs::path(&_savePath[0]).replace_extension(S5::extensionSV5).u8string();
                 std::strncpy(&_currentScenarioFilename[0], path.c_str(), std::size(_currentScenarioFilename));
 
-                S5::SaveFlags flags = {};
+                uint32_t saveFlags = 0;
                 if (Config::get().flags & Config::flags::export_objects_with_saves)
-                    flags = S5::SaveFlags::packCustomObjects;
+                    saveFlags |= S5::SaveFlags::packCustomObjects;
 
-                if (!S5::save(path, flags))
+                if (!S5::save(path, saveFlags))
                     Ui::Windows::Error::open(StringIds::error_game_save_failed, StringIds::null);
                 else
                     GameCommands::do_21(2, 0);

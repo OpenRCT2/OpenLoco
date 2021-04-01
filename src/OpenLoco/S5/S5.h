@@ -121,6 +121,16 @@ namespace OpenLoco::S5
     static_assert(0x009C8714 + offsetof(Options, numberOfIndustries) == 0x009C889D);
     static_assert(0x009C8714 + offsetof(Options, scenarioName) == 0x009C873E);
     static_assert(0x009C8714 + offsetof(Options, scenarioDetails) == 0x009C877E);
+    static_assert(0x009C8714 + offsetof(Options, objectiveType) == 0x009CC8A0);
+    static_assert(0x009C8714 + offsetof(Options, objectiveFlags) == 0x009CC8A1);
+    static_assert(0x009C8714 + offsetof(Options, objectiveCompanyValue) == 0x009CC8A2);
+    static_assert(0x009C8714 + offsetof(Options, objectiveMonthlyVehicleProfit) == 0x009CC8A6);
+    static_assert(0x009C8714 + offsetof(Options, objectivePerformanceIndex) == 0x009CC8AA);
+    static_assert(0x009C8714 + offsetof(Options, objectiveDeliveredCargoType) == 0x009CC8AB);
+    static_assert(0x009C8714 + offsetof(Options, objectiveDeliveredCargoAmount) == 0x009CC8AC);
+    static_assert(0x009C8714 + offsetof(Options, objectiveTimeLimitYears) == 0x009CC8B0);
+    static_assert(0x009C8714 + offsetof(Options, objectiveDeliveredCargo) == 0x009CC8B1);
+    static_assert(0x009C8714 + offsetof(Options, currency) == 0x009CC8C1);
 
     static_assert(0x009CCA54 + offsetof(Options, scenarioFlags) == 0x009CCA5A);
     static_assert(0x009CCA54 + offsetof(Options, preview) == 0x009CCBDE);
@@ -240,13 +250,14 @@ namespace OpenLoco::S5
         char scenarioName[64];            // 0x0002BC (0x005260D4)
         char scenarioDetails[256];        // 0x0002FC (0x00526114)
         uint8_t pad_03FC[0xB96C - 0x3FC]; // 0x0003FC
-        Company companies[15];            // 0x00B96C (0x00531784)
-        Town towns[80];                   // 0x092444 (0x005B825C)
-        Industry industries[128];         // 0x09E744 (0x005C455C)
-        Station stations[1024];           // 0x0C10C4 (0x005E6EDC)
-        Entity entities[20000];           // 0x1B58C4 (0x006DB6DC)
-        Animation animations[8192];       // 0x4268C4 (0x0094C6DC)
-        uint8_t pad_4328C4[0x6DD80];      // 0x4328C4 (0x009586DC)
+
+        Company companies[15];       // 0x00B96C (0x00531784)
+        Town towns[80];              // 0x092444 (0x005B825C)
+        Industry industries[128];    // 0x09E744 (0x005C455C)
+        Station stations[1024];      // 0x0C10C4 (0x005E6EDC)
+        Entity entities[20000];      // 0x1B58C4 (0x006DB6DC)
+        Animation animations[8192];  // 0x4268C4 (0x0094C6DC)
+        uint8_t pad_4328C4[0x6DD80]; // 0x4328C4 (0x009586DC)
     };
 #pragma pack(pop)
     static_assert(sizeof(GameState) == 0x4A0644);
@@ -261,15 +272,15 @@ namespace OpenLoco::S5
         std::vector<TileElement> tileElements;
     };
 
-    enum SaveFlags : uint32_t
+    namespace SaveFlags
     {
-        packCustomObjects = 1 << 0,
-        scenario = 1 << 1,
-        landscape = 1 << 2,
-        noWindowClose = 1u << 29,
-        raw = 1u << 30,  // Save raw data including pointers with no clean up
-        dump = 1u << 31, // Used for dumping the game state when there is a fatal error
-    };
+        constexpr uint32_t packCustomObjects = 1 << 0;
+        constexpr uint32_t scenario = 1 << 1;
+        constexpr uint32_t landscape = 1 << 2;
+        constexpr uint32_t noWindowClose = 1u << 29;
+        constexpr uint32_t raw = 1u << 30;  // Save raw data including pointers with no clean up
+        constexpr uint32_t dump = 1u << 31; // Used for dumping the game state when there is a fatal error
+    }
 
     constexpr const char* extensionSC5 = ".SC5";
     constexpr const char* extensionSV5 = ".SV5";
@@ -279,6 +290,6 @@ namespace OpenLoco::S5
 
     Options& getOptions();
     Options& getPreviewOptions();
-    bool save(const fs::path& path, SaveFlags flags);
+    bool save(const fs::path& path, uint32_t flags);
     void registerHooks();
 }
