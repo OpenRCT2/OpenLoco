@@ -41,7 +41,9 @@
 #include "Localisation/LanguageFiles.h"
 #include "Localisation/Languages.h"
 #include "Localisation/StringIds.h"
+#include "Map/TileManager.h"
 #include "MultiPlayer.h"
+#include "Objects/BuildingObject.h"
 #include "Objects/ObjectManager.h"
 #include "OpenLoco.h"
 #include "Platform/Platform.h"
@@ -807,6 +809,113 @@ namespace OpenLoco
     static loco_global<int8_t, 0x0050C197> _50C197;
     static loco_global<string_id, 0x0050C198> _50C198;
 
+    static void sub_42DF8B(building_element* el)
+    {
+        // call(0x0042DF8B);
+
+        if (el->var_5b())
+            return;
+
+        if (el->is_flag_4())
+            return;
+
+        auto object = el->object();
+
+        if (!el->has_station_element())
+        {
+            // 0x00042DFB3
+        }
+
+        if (el->has_40())
+            return;
+
+        // 0x0042E2AB
+
+        town_id_t townId;
+        {
+            registers regs;
+
+            call(0x00497E52, regs);
+            townId = regs.bx;
+        }
+
+        if (townId == town_id::null)
+            return;
+
+        auto town = townmgr::get(townId);
+
+        if (!el->has_station_element())
+        {
+            el->data()[5] += 0x20; // sets carry
+            if (carry && el->var_6a() != 0x3F && (object->var_98 & 1) == 0)
+            {
+                // probably has to do with large buildings
+                // update field 6 +1 for all parts
+            }
+        }
+
+        // 0x0042E3A1
+        if (el->has_station_element() && el->var_6a() >= 40)
+        {
+
+            if ((town->prng->rand_next() &= 0xFFFF) <= 16)
+            {
+                throw std::exception(); // return false;
+            }
+        }
+    }
+
+    static bool sub_4FD2C4(tile_element* el)
+    {
+        switch (el->type())
+        {
+
+            case element_type::surface:
+                call(0x004691FA);
+                break;
+            case element_type::unk_1: break;
+            case element_type::station: break;
+            case element_type::unk_3: break;
+            case element_type::building:
+                sub_42DF8B(el->as_building());
+                break;
+            case element_type::industry:
+                call(0x004BD52B);
+                break;
+            case element_type::unk_6: break;
+            case element_type::unk_7:
+                call(0x00477FC2);
+                break;
+            case element_type::unk_8:
+                call(0x00456FF7);
+                break;
+        }
+    }
+
+    static void sub_463ABA()
+    {
+        //  call(0x00463ABA);
+
+        if ((addr<0x00525E28, uint32_t>() & 1) == 0)
+        {
+            return;
+        }
+
+        companymgr::updating_company_id(company_id::neutral);
+
+        uint16_t ax = addr<0x00525F6E, uint16_t>();
+        uint16_t cx = addr<0x00525F70, uint16_t>();
+
+        auto tile = map::tilemgr::get(ax, cx);
+        for (auto& el : tile)
+        {
+            if (el.is_flag_4())
+                continue;
+
+            auto res = sub_4FD2C4(el);
+        }
+    }
+
     // 0x0046ABCB
     static void tickLogic()
     {
@@ -817,7 +926,7 @@ namespace OpenLoco
         call(0x004613F0);
         addr<0x00F25374, uint8_t>() = S5::getOptions().madeAnyChanges;
         dateTick();
-        call(0x00463ABA);
+        sub_463ABA();
         call(0x004C56F6);
         TownManager::update();
         IndustryManager::update();
