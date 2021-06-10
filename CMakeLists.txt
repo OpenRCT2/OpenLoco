@@ -98,7 +98,9 @@ set(COMMON_COMPILE_OPTIONS
     -Wformat \
     -Wignored-qualifiers \
     -Winit-self \
-    -Wmissing-declarations \
+    -Wno-missing-declarations \
+    -Wno-effc++ \
+    -Wno-shadow \
     -Wnon-virtual-dtor \
     -Wnull-dereference \
     -Wstrict-aliasing \
@@ -222,8 +224,9 @@ if ("${CMAKE_SYSTEM_NAME}" MATCHES "(Free|Net|Open|DragonFly)BSD")
     find_package(yaml-cpp REQUIRED)
     include_directories(${YAML_CPP_INCLUDE_DIR})
 else()
-    find_package(yaml-cpp REQUIRED HINTS /usr/lib32/cmake/yaml-cpp)
 endif()
+include_directories(/usr/include/SDL2/)
+include_directories("${CMAKE_SOURCE_DIR}/yaml-cpp/include")
 
 # Disable optimizations for interop.cpp for all compilers, to allow optimized
 # builds without need for -fno-omit-frame-pointer
@@ -241,8 +244,10 @@ else ()
     set_target_properties(${PROJECT} PROPERTIES LINK_FLAGS ${LOCO_SEGMENT_LINKER_FLAGS})
 endif ()
 
+add_subdirectory(yaml-cpp)
+
 target_link_libraries(${PROJECT} ${SDL2_LIBRARIES} ${SDL2_MIXER_LIBRARIES})
-target_link_libraries(${PROJECT} yaml-cpp ${YAML_CPP_LIBRARIES})
+target_link_libraries(${PROJECT} yaml-cpp)
 target_link_libraries(${PROJECT} ${PNG_LIBRARIES})
 
 
