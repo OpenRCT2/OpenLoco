@@ -3071,6 +3071,20 @@ namespace OpenLoco::Vehicles
                         cantWait = true;
                         break;
                     }
+                    if (carComponent.back->secondaryCargo.type == waitFor->getCargo() && carComponent.back->secondaryCargo.maxQty != carComponent.back->secondaryCargo.qty)
+                    {
+                        if (!(var_5F & Flags5F::unk_0))
+                        {
+                            beginLoading();
+                            return true;
+                        }
+                        if (owner == CompanyManager::getControllingId())
+                        {
+                            MessageManager::post(MessageType::cantWaitForFullLoad, owner, id, stationId);
+                        }
+                        cantWait = true;
+                        break;
+                    }
                     if (carComponent.body->primaryCargo.type == waitFor->getCargo() && carComponent.body->primaryCargo.maxQty != carComponent.body->primaryCargo.qty)
                     {
                         if (!(var_5F & Flags5F::unk_0))
