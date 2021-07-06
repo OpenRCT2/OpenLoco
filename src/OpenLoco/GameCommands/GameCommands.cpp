@@ -90,7 +90,7 @@ namespace OpenLoco::GameCommands
         { GameCommand::gc_unk_41,                    nullptr,                   0x0047A42F, true  },
         { GameCommand::gc_unk_42,                    nullptr,                   0x0048C708, true  },
         { GameCommand::gc_unk_43,                    nullptr,                   0x0048D2AC, true  },
-        { GameCommand::gc_unk_44,                    nullptr,                   0x0042D133, true  },
+        { GameCommand::createBuilding,               nullptr,                   0x0042D133, true  },
         { GameCommand::gc_unk_45,                    nullptr,                   0x0042D74E, true  },
         { GameCommand::renameTown,                   renameTown,                0x0049B11E, false },
         { GameCommand::createIndustry,               nullptr,                   0x0045436B, true  },
