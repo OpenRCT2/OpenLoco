@@ -2038,7 +2038,7 @@ namespace OpenLoco::Ui::Windows::Construction::Construction
                 pos3D.y += 0x2010;
                 pos3D.z += 0x1CC;
 
-                auto pos2D = coordinate3dTo2d(pos3D.x, pos3D.y, pos3D.z, gCurrentRotation);
+                auto pos2D = gameToScreen(pos3D, gCurrentRotation);
                 xy32 pos = { pos2D.x, pos2D.y };
                 drawRoadCost(self, clipped, context, pos, width, height);
             }
@@ -2088,7 +2088,7 @@ namespace OpenLoco::Ui::Windows::Construction::Construction
                 pos3D.y += 0x2010;
                 pos3D.z += 0x1CC;
 
-                auto pos2D = coordinate3dTo2d(pos3D.x, pos3D.y, pos3D.z, gCurrentRotation);
+                auto pos2D = gameToScreen(pos3D, gCurrentRotation);
                 xy32 pos = { pos2D.x, pos2D.y };
                 drawTrackCost(self, clipped, context, pos, width, height);
             }
