@@ -311,6 +311,11 @@ namespace OpenLoco::Gfx
                     curString.push_back(*++chr);
                     break;
 
+                case ControlCodes::newline_x_y:
+                    curString.push_back(*++chr);
+                    curString.push_back(*++chr);
+                    break;
+
                 default:
                     if (*chr <= 0x16)
                     {
