@@ -7,10 +7,11 @@
 namespace OpenLoco::Math::Vector
 {
 #pragma pack(push, 1)
-    template<typename T, T TResolution>
+    template<typename T, T TResolution, bool TIsGameSpace = true>
     struct TVector2
     {
         static constexpr auto Resolution = TResolution;
+        static constexpr auto IsGameSpace = TIsGameSpace;
 
         T x = 0;
         T y = 0;
